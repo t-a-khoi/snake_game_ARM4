@@ -184,13 +184,13 @@ void placeObstaclePlus(void) {
 
 void placeMazeObstacles(void) {
     // ===== THANH DỌC BÊN TRÁI =====
-    for (int y = 2; y <= 10; y++) {
+    for (int y = 2; y <= 12; y++) {
         gameGrid[2][y] = 3;
         drawCell(2, y, BRRED);
     }
 
     // ===== THANH DỌC BÊN PHẢI =====
-    for (int y = 5; y <= 15; y++) {
+    for (int y = 5; y <= 12; y++) {
         gameGrid[13][y] = 3;
         drawCell(13, y, BRRED);
     }
@@ -208,7 +208,7 @@ void placeMazeObstacles(void) {
     }
 
     // ===== THANH NGANG DƯỚI =====
-    for (int x = 3; x <= 10; x++) {
+    for (int x = 3; x <= 12; x++) {
         gameGrid[x][15] = 3;
         drawCell(x, 15, BRRED);
     }

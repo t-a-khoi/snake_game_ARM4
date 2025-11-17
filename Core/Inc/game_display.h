@@ -14,7 +14,7 @@
 #include "game_control.h"
 
 #define SCREEN_X 40
-#define SCREEN_Y 35
+#define SCREEN_Y 40
 #define SCREEN_SIZE 160
 #define CELL_SIZE 10
 #define GRID_ROWS SCREEN_SIZE/CELL_SIZE

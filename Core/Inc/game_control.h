@@ -8,9 +8,9 @@
 #include "button.h"
 
 
-#define DIRECTION_BTN_X 50
-#define DIRECTION_BTN_Y 160
-#define DIRECTION_BTN_SIZE 40
+#define DIRECTION_BTN_X 80
+#define DIRECTION_BTN_Y 180
+#define DIRECTION_BTN_SIZE 20
 extern uint8_t selectedMap;
 void gameFSM(void);
 
