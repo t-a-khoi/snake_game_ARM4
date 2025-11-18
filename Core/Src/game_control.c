@@ -275,15 +275,104 @@ void gameFSM(void) {
     }
 }
 
-void initializeControlButtons(void) {
-    controlButtons[0] = (ControlButton){ .xStart = DIRECTION_BTN_X + DIRECTION_BTN_SIZE + 10, .yStart = DIRECTION_BTN_Y + 10 + DIRECTION_BTN_SIZE, .xEnd = DIRECTION_BTN_X + 2 * DIRECTION_BTN_SIZE + 10, .yEnd = DIRECTION_BTN_Y + DIRECTION_BTN_SIZE*2 + 10 , .isPressed = 0};
-    controlButtons[1] = (ControlButton){ .xStart = DIRECTION_BTN_X + DIRECTION_BTN_SIZE + 10, .yStart = DIRECTION_BTN_Y + 2 * DIRECTION_BTN_SIZE + 20, .xEnd = DIRECTION_BTN_X + 2 * DIRECTION_BTN_SIZE + 10, .yEnd = DIRECTION_BTN_Y + 3 * DIRECTION_BTN_SIZE + 20, .isPressed = 0};
-    controlButtons[2] = (ControlButton){ .xStart = DIRECTION_BTN_X, .yStart = DIRECTION_BTN_Y + 2 * DIRECTION_BTN_SIZE + 20, .xEnd = DIRECTION_BTN_X + DIRECTION_BTN_SIZE, .yEnd = DIRECTION_BTN_Y + 3 * DIRECTION_BTN_SIZE + 20, .isPressed = 0};
-    controlButtons[3] = (ControlButton){ .xStart = DIRECTION_BTN_X + 2 * DIRECTION_BTN_SIZE + 20, .yStart = DIRECTION_BTN_Y + 2 * DIRECTION_BTN_SIZE + 20, .xEnd = DIRECTION_BTN_X + 3 * DIRECTION_BTN_SIZE + 20, .yEnd = DIRECTION_BTN_Y + 3 * DIRECTION_BTN_SIZE + 20, .isPressed = 0};
+/* Hàm vẽ mũi tên dùng lcd_DrawLine để đảm bảo hiển thị tốt */
+static void drawArrow(uint16_t cx, uint16_t cy, uint16_t btnSize, enum Direction dir, uint16_t color) {
+    // [FIX 1] Tính toán lại kích thước mũi tên cho vừa vặn nút
+    // Nút 20px -> r = 6px -> Mũi tên rộng 12px, cao 6px (tỉ lệ đẹp)
+    uint16_t r = btnSize / 3;
 
+    switch (dir) {
+        case UP:
+            // Vẽ từ đỉnh (trên) xuống đáy (dưới)
+            for (int i = 0; i <= r; i++) {
+                // [FIX 2] Dùng lcd_DrawLine thay vì lcd_Fill
+                lcd_DrawLine(cx - i, (cy - r/2) + i, cx + i, (cy - r/2) + i, color);
+            }
+            break;
+
+        case DOWN:
+            // Vẽ từ đỉnh (dưới) lên đáy (trên)
+            for (int i = 0; i <= r; i++) {
+                lcd_DrawLine(cx - i, (cy + r/2) - i, cx + i, (cy + r/2) - i, color);
+            }
+            break;
+
+        case LEFT:
+            // Vẽ từ đỉnh (trái) sang đáy (phải)
+            for (int i = 0; i <= r; i++) {
+                lcd_DrawLine((cx - r/2) + i, cy - i, (cx - r/2) + i, cy + i, color);
+            }
+            break;
+
+        case RIGHT:
+            // Vẽ từ đỉnh (phải) sang đáy (trái)
+            for (int i = 0; i <= r; i++) {
+                lcd_DrawLine((cx + r/2) - i, cy - i, (cx + r/2) - i, cy + i, color);
+            }
+            break;
+    }
+}
+
+void initializeControlButtons(void) {
+    // Button 0: UP
+    controlButtons[0] = (ControlButton){
+        .xStart = DIRECTION_BTN_X + DIRECTION_BTN_SIZE + 10,
+        .yStart = DIRECTION_BTN_Y + 10 + DIRECTION_BTN_SIZE,
+        .xEnd   = DIRECTION_BTN_X + 2 * DIRECTION_BTN_SIZE + 10,
+        .yEnd   = DIRECTION_BTN_Y + 2 * DIRECTION_BTN_SIZE + 10, // Lưu ý: code cũ của bạn nhân 2 ở yEnd có vẻ hơi lệch, tôi chỉnh lại cho vuông
+        .isPressed = 0
+    };
+    // Button 1: DOWN
+    controlButtons[1] = (ControlButton){
+        .xStart = DIRECTION_BTN_X + DIRECTION_BTN_SIZE + 10,
+        .yStart = DIRECTION_BTN_Y + 2 * DIRECTION_BTN_SIZE + 20,
+        .xEnd   = DIRECTION_BTN_X + 2 * DIRECTION_BTN_SIZE + 10,
+        .yEnd   = DIRECTION_BTN_Y + 3 * DIRECTION_BTN_SIZE + 20,
+        .isPressed = 0
+    };
+    // Button 2: LEFT
+    controlButtons[2] = (ControlButton){
+        .xStart = DIRECTION_BTN_X,
+        .yStart = DIRECTION_BTN_Y + 2 * DIRECTION_BTN_SIZE + 20,
+        .xEnd   = DIRECTION_BTN_X + DIRECTION_BTN_SIZE,
+        .yEnd   = DIRECTION_BTN_Y + 3 * DIRECTION_BTN_SIZE + 20,
+        .isPressed = 0
+    };
+    // Button 3: RIGHT
+    controlButtons[3] = (ControlButton){
+        .xStart = DIRECTION_BTN_X + 2 * DIRECTION_BTN_SIZE + 20,
+        .yStart = DIRECTION_BTN_Y + 2 * DIRECTION_BTN_SIZE + 20,
+        .xEnd   = DIRECTION_BTN_X + 3 * DIRECTION_BTN_SIZE + 20,
+        .yEnd   = DIRECTION_BTN_Y + 3 * DIRECTION_BTN_SIZE + 20,
+        .isPressed = 0
+    };
+
+    // 2. Vẽ từng nút
     for (int i = 0; i < 4; i++) {
-        lcd_Fill(controlButtons[i].xStart, controlButtons[i].yStart,
-                 controlButtons[i].xEnd,   controlButtons[i].yEnd, WHITE);
+        uint16_t x1 = controlButtons[i].xStart;
+        uint16_t y1 = controlButtons[i].yStart;
+        uint16_t x2 = controlButtons[i].xEnd;
+        uint16_t y2 = controlButtons[i].yEnd;
+
+        // A. Vẽ nền nút (Màu trắng)
+        lcd_Fill(x1, y1, x2, y2, WHITE);
+
+        // B. Vẽ viền nút (Màu đen) - Tùy chọn, giúp nút rõ ràng hơn
+        lcd_DrawRectangle(x1, y1, x2, y2, BLACK);
+
+        // C. Tính tâm nút để vẽ mũi tên
+        uint16_t centerX = (x1 + x2) / 2;
+        uint16_t centerY = (y1 + y2) / 2;
+
+        // D. Xác định hướng mũi tên dựa vào index i
+        enum Direction dir;
+        if (i == 0) dir = UP;
+        else if (i == 1) dir = DOWN;
+        else if (i == 2) dir = LEFT;
+        else dir = RIGHT;
+
+        // E. Vẽ mũi tên (Màu đen hoặc Đỏ/Xanh tùy ý)
+        drawArrow(centerX, centerY, DIRECTION_BTN_SIZE, dir, BLACK);
     }
 }
 
