@@ -355,10 +355,16 @@ uint8_t isStartScreenTouched(void) {
 
     uint16_t tx = touch_GetX();
     uint16_t ty = touch_GetY();
-    uint16_t btnX1 = SCREEN_X + 35;
-    uint16_t btnX2 = SCREEN_X + SCREEN_SIZE - 35;
-    uint16_t btnY1 = SCREEN_Y + 125;
-    uint16_t btnY2 = SCREEN_Y + 170;
+
+    // [FIX] Đồng bộ tọa độ chạm với tọa độ vẽ đã sửa ở trên
+    uint16_t btnTop = 165; // Vị trí Y cố định
+    uint16_t btnHeight = 45;
+    uint16_t btnWidth = 150; // Kích thước W cố định
+    uint16_t btnX1 = (240 - btnWidth) / 2; // Căn giữa nút
+    uint16_t btnX2 = btnX1 + btnWidth;
+    uint16_t btnY1 = btnTop;
+    uint16_t btnY2 = btnTop + btnHeight;
+
 
     if (tx > btnX1 && tx < btnX2 &&
         ty > btnY1 && ty < btnY2) {

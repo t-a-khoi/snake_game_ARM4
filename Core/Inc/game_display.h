@@ -13,9 +13,9 @@
 #include "touch.h"
 #include "game_control.h"
 
-#define SCREEN_X 40
+#define SCREEN_X 10
 #define SCREEN_Y 40
-#define SCREEN_SIZE 160
+#define SCREEN_SIZE 220
 #define CELL_SIZE 10
 #define GRID_ROWS SCREEN_SIZE/CELL_SIZE
 #define GRID_COLS SCREEN_SIZE/CELL_SIZE

@@ -332,22 +332,29 @@ void handleInput(void) {
 /* Start screen giữ nguyên như trước */
 void displayStartScreen(void) {
     lcd_Fill(0, 0, 240, 320, BLACK);
-    lcd_ShowStr(SCREEN_X + 25, SCREEN_Y + 10, "SNAKE GAME", WHITE, BLACK, 24, 0);
 
-    lcd_ShowStr(SCREEN_X + 10, SCREEN_Y + 45, "Choose color", WHITE, BLACK, 16, 0);
+    // [FIX] Căn giữa chữ "SNAKE GAME" (font 24) theo chiều rộng 240px
+    lcd_ShowStr(55, 50, "SNAKE GAME", WHITE, BLACK, 24, 0);
 
-    uint16_t top  = SCREEN_Y + 70;
-    uint16_t left = SCREEN_X + 10;
+    // [FIX] Căn giữa chữ "Choose color" (font 16)
+    lcd_ShowStr(70, 85, "Choose color", WHITE, BLACK, 16, 0);
+
+    // [FIX] Cố định vị trí Y và căn giữa cụm 4 box màu
+    uint16_t top  = 110; // Vị trí Y cố định
     uint16_t w    = 26;
     uint16_t h    = 25;
     uint16_t gap  = 10;
+    uint16_t total_w = (w * 4) + (gap * 3);
+    uint16_t left = (240 - total_w) / 2; // Căn giữa cụm box
 
+    // Box 1 (GREEN)
     lcd_Fill(left, top, left + w, top + h, GREEN);
     lcd_Fill(left-1, top-1, left + w+1, top+1, WHITE);
     lcd_Fill(left-1, top+h-1, left + w+1, top+h+1, WHITE);
     lcd_Fill(left-1, top-1, left+1, top+h+1, WHITE);
     lcd_Fill(left+w-1, top-1, left+w+1, top+h+1, WHITE);
 
+    // Box 2 (BLUE)
     uint16_t x2 = left + (w + gap);
     lcd_Fill(x2, top, x2 + w, top + h, BLUE);
     lcd_Fill(x2-1, top-1, x2 + w+1, top+1, WHITE);
@@ -355,6 +362,7 @@ void displayStartScreen(void) {
     lcd_Fill(x2-1, top-1, x2+1, top+h+1, WHITE);
     lcd_Fill(x2+w-1, top-1, x2+w+1, top+h+1, WHITE);
 
+    // Box 3 (MAGENTA)
     uint16_t x3 = left + (w + gap)*2;
     lcd_Fill(x3, top, x3 + w, top + h, MAGENTA);
     lcd_Fill(x3-1, top-1, x3 + w+1, top+1, WHITE);
@@ -362,6 +370,7 @@ void displayStartScreen(void) {
     lcd_Fill(x3-1, top-1, x3+1, top+h+1, WHITE);
     lcd_Fill(x3+w-1, top-1, x3+w+1, top+h+1, WHITE);
 
+    // Box 4 (YELLOW)
     uint16_t x4 = left + (w + gap)*3;
     lcd_Fill(x4, top, x4 + w, top + h, YELLOW);
     lcd_Fill(x4-1, top-1, x4 + w+1, top+1, WHITE);
@@ -369,16 +378,25 @@ void displayStartScreen(void) {
     lcd_Fill(x4-1, top-1, x4+1, top+h+1, WHITE);
     lcd_Fill(x4+w-1, top-1, x4+w+1, top+h+1, WHITE);
 
-    uint16_t btnTop = SCREEN_Y + 125;
-    lcd_Fill(SCREEN_X + 35, btnTop, SCREEN_X + SCREEN_SIZE - 35, btnTop + 45, GREEN);
-    lcd_Fill(SCREEN_X + 35, btnTop, SCREEN_X + SCREEN_SIZE - 35, btnTop + 2, WHITE);
-    lcd_Fill(SCREEN_X + 35, btnTop + 43, SCREEN_X + SCREEN_SIZE - 35, btnTop + 45, WHITE);
-    lcd_Fill(SCREEN_X + 35, btnTop, SCREEN_X + 37, btnTop + 45, WHITE);
-    lcd_Fill(SCREEN_X + SCREEN_SIZE - 37, btnTop, SCREEN_X + SCREEN_SIZE - 35, btnTop + 45, WHITE);
-    lcd_ShowStr(SCREEN_X + 50, btnTop + 10, "START", WHITE, GREEN, 24, 1);
+    // [FIX] Cố định vị trí và kích thước nút START
+    uint16_t btnTop = 165; // Vị trí Y cố định
+    uint16_t btnHeight = 45;
+    uint16_t btnWidth = 150; // Kích thước W cố định
+    uint16_t btnX1 = (240 - btnWidth) / 2; // Căn giữa nút
+    uint16_t btnX2 = btnX1 + btnWidth;
 
-    uint16_t snakePreviewY = btnTop + 60;
-    uint16_t snakePreviewX = SCREEN_X + 60;
+    lcd_Fill(btnX1, btnTop, btnX2, btnTop + btnHeight, GREEN);
+    lcd_Fill(btnX1, btnTop, btnX2, btnTop + 2, WHITE);
+    lcd_Fill(btnX1, btnTop + btnHeight - 2, btnX2, btnTop + btnHeight, WHITE);
+    lcd_Fill(btnX1, btnTop, btnX1 + 2, btnTop + btnHeight, WHITE);
+    lcd_Fill(btnX2 - 2, btnTop, btnX2, btnTop + btnHeight, WHITE);
+
+    // [FIX] Căn giữa chữ "START" (font 24) bên trong nút
+    lcd_ShowStr(btnX1 + 45, btnTop + 10, "START", WHITE, GREEN, 24, 1);
+
+    // [FIX] Căn giữa phần preview
+    uint16_t snakePreviewY = btnTop + btnHeight + 15; // Ngay dưới nút START
+    uint16_t snakePreviewX = (240 - (3 * 15)) / 2;    // Căn giữa 3 ô preview
     uint16_t previewColor = (snake.color ? snake.color : GREEN);
 
     for (int i = 0; i < 3; i++) {
@@ -397,11 +415,13 @@ uint16_t startScreenHandleColorTouch(void) {
     uint16_t tx = touch_GetX();
     uint16_t ty = touch_GetY();
 
-    uint16_t top  = SCREEN_Y + 70;
-    uint16_t left = SCREEN_X + 10;
+    // [FIX] Đồng bộ tọa độ chạm với tọa độ vẽ đã sửa ở trên
+    uint16_t top  = 110; // Vị trí Y cố định
     uint16_t w    = 26;
     uint16_t h    = 25;
     uint16_t gap  = 10;
+    uint16_t total_w = (w * 4) + (gap * 3);
+    uint16_t left = (240 - total_w) / 2; // Căn giữa cụm box
 
     if (tx > left && tx < left + w &&
         ty > top  && ty < top + h) {

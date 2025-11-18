@@ -9,7 +9,7 @@
 
 
 #define DIRECTION_BTN_X 80
-#define DIRECTION_BTN_Y 180
+#define DIRECTION_BTN_Y 240
 #define DIRECTION_BTN_SIZE 20
 extern uint8_t selectedMap;
 void gameFSM(void);
